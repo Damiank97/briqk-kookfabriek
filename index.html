@@ -394,6 +394,8 @@ Het Horeca Deals Team</div>
 </footer>
 
 <script>
+function delay(ms){return new Promise(function(r){setTimeout(r,ms);})}
+
 function expandEmail(idx){
   var mails=document.querySelectorAll('.inbox-mail');
   mails.forEach(function(m){if(m.dataset.i!=idx)m.classList.remove('active');});
