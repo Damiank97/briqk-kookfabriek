@@ -540,24 +540,23 @@ async function qualAnswer(text){
   qLoading=true;addQTyping();
   await delay(680);removeQTyping();
 
-  // Na 3 antwoorden (type, personen, timing) → popup
+  // Fase 1: qA[0]=type, qA[1]=personen, qA[2]=timing
+  if(qA.length < 3){
+    addQMsg(QUAL[qA.length].q,'bot');
+    showQBtns(QUAL[qA.length].btns);
+    qLoading=false;
+    return;
+  }
   if(qA.length===3){
     addQMsg('Om u beter te helpen, vragen wij nog even uw contactgegevens.','bot');
     setTimeout(function(){document.getElementById('popupOverlay').classList.add('open');},400);
     qLoading=false;
     return;
   }
-
-  // Na popup zijn qA[3]=naam, qA[4]=tel, qA[5]=bedrijf (al ingevuld door submitPopup)
-  // Stap index = antwoorden na popup: qA.length - 3 (de popup-data) = chatAntwoorden
-  var chatCount=qA.length-3; // 1,2 = locatie,budget
-
-  if(qA.length<9){ // nog niet alle vragen gehad (max 3 chat + 3 popup + 2 chat = 8 answers before final)
-    var stepIdx=chatCount; // 1 of 2 → QUAL[3] of QUAL[4]
-    if(QUAL[stepIdx]){
-      addQMsg(QUAL[stepIdx].q,'bot');
-      showQBtns(QUAL[stepIdx].btns);
-    }
+  // Fase 2: qA[3]=naam qA[4]=tel qA[5]=bedrijf, qA[6]=locatie, qA[7]=budget
+  if(qA.length < 8){
+    var stepIdx=qA.length-3; // 4 -> QUAL[4]
+    if(QUAL[stepIdx]){addQMsg(QUAL[stepIdx].q,'bot');showQBtns(QUAL[stepIdx].btns);}
     qLoading=false;
   } else {
     document.getElementById('qualProgress').style.width='100%';
