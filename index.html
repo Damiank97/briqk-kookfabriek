@@ -548,14 +548,26 @@ async function qualAnswer(text){
       var warm=qA[1].indexOf('100')!==-1||qA[1].indexOf('40')!==-1||qA[7].indexOf('beschikbaar')!==-1;
       addQMsg(warm?'Uitstekend, dit klinkt als een mooie gelegenheid! Iemand van ons team neemt zo spoedig mogelijk contact met u op.':'Hartelijk dank voor uw interesse. We sturen u graag meer informatie toe zodra u er klaar voor bent.','bot');
     }
-    // Bevestiging op de achtergrond
+    // Achtergrond acties kaart
     setTimeout(function(){
       var c=document.getElementById('qualMessages');
-      var conf=document.createElement('div');
-      conf.style.cssText='margin:6px 0 4px 34px;font-size:11px;color:var(--yellow-dark);display:flex;align-items:center;gap:5px;font-weight:600;';
-      conf.innerHTML='✓ Uw gegevens zijn ontvangen — bevestiging verstuurd via e-mail';
-      c.appendChild(conf);c.scrollTop=c.scrollHeight;
-    },800);
+      var naam2=qA[3]||'de aanvrager';
+      var isWarm2=qA[1].indexOf('100')!==-1||qA[1].indexOf('40')!==-1||qA[7].indexOf('beschikbaar')!==-1;
+      var card=document.createElement('div');
+      card.style.cssText='margin:10px 0 4px 34px;background:var(--white);border:1px solid var(--border);border-radius:3px;overflow:hidden;font-size:12px;';
+      card.innerHTML='<div style="background:var(--brown);padding:8px 12px;font-family:var(--font-display);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--yellow);">Acties op de achtergrond</div>'
+        +'<div style="display:flex;flex-direction:column;gap:0;">'
+        +(isWarm2?'<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);color:var(--text);">'
+        +'<span style="color:var(--yellow-dark);font-weight:700;">✓</span><span>WhatsApp notificatie verstuurd naar <strong>de ontvanger</strong></span></div>':'')
+        +'<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);color:var(--text);">'
+        +'<span style="color:var(--yellow-dark);font-weight:700;">✓</span><span>Bevestiging e-mail verstuurd naar <strong>'+naam2+'</strong></span></div>'
+        +(isWarm2?'<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;color:var(--text);">'
+        +'<span style="color:var(--yellow-dark);font-weight:700;">✓</span><span>Lead gemarkeerd als <strong>Warm</strong> — opvolging ingepland</span></div>'
+        :'<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;color:var(--text);">'
+        +'<span style="color:var(--text-light);">→</span><span style="color:var(--text-mid);">Lead gemarkeerd als <strong>Koud</strong> — nurture-mail ingepland</span></div>')
+        +'</div>';
+      c.appendChild(card);c.scrollTop=c.scrollHeight;
+    },900);
     document.getElementById('qualInput').disabled=true;document.getElementById('qualSend').disabled=true;
     document.getElementById('qualInput').placeholder='Gesprek afgerond';
     qLoading=false;
@@ -584,9 +596,11 @@ function submitLeadForm(){
   var naam=document.getElementById('lfNaam').value.trim();
   var tel=document.getElementById('lfTel').value.trim();
   var digits=tel.replace(/[^0-9]/g,'');
+  var telValid=digits.length>=10&&digits.length<=15&&(tel.trim().startsWith('0')||tel.trim().startsWith('+'));
   if(!naam){document.getElementById('lfNaam').focus();return;}
-  if(digits.length<10){
+  if(!telValid){
     document.getElementById('lfTelErr').style.display='block';
+    document.getElementById('lfTelErr').textContent=digits.length>15?'Telefoonnummer is te lang.':'Vul een geldig telefoonnummer in (bijv. 06 12345678).';
     document.getElementById('lfTel').style.borderColor='rgba(176,58,46,0.5)';
     document.getElementById('lfTel').focus();return;
   }
