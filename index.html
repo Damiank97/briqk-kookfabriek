@@ -73,6 +73,11 @@
   .mail-subject { font-size: 12px; color: var(--text-mid); margin-top: 2px; }
   .mail-preview { font-size: 11px; color: var(--text-light); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .mail-time { font-size: 11px; color: var(--text-light); flex-shrink: 0; }
+  .mail-expanded { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-mid); line-height: 1.75; white-space: pre-wrap; font-weight: 300; }
+  .inbox-mail.active .mail-expanded { display: block; }
+  .mail-run-btn { display: none; margin-top: 10px; background: var(--yellow); color: var(--brown); border: none; padding: 7px 16px; border-radius: 2px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font-display); letter-spacing: 0.04em; text-transform: uppercase; transition: background 0.2s; }
+  .mail-run-btn:hover { background: var(--yellow-dark); }
+  .inbox-mail.active .mail-run-btn { display: inline-block; }
 
   /* PIPELINE */
   .pipeline { display: none; padding: 14px 18px; border-top: 1px solid var(--border); background: var(--off-white); }
@@ -231,30 +236,52 @@
       </div>
     </div>
     <div class="inbox-list" id="inboxList">
-      <div class="inbox-mail" onclick="runEmail(0)" data-i="0">
+      <div class="inbox-mail" onclick="expandEmail(0)" data-i="0">
         <div class="mail-dot new"></div>
         <div class="mail-content">
           <div class="mail-from">Anke Vermeer &lt;a.vermeer@gmail.com&gt;</div>
           <div class="mail-subject">Kookworkshop voor mijn verjaardag</div>
           <div class="mail-preview">Hallo, ik wil een workshop boeken voor mijn verjaardag. We zijn met 10 personen...</div>
+          <div class="mail-expanded">Hallo,
+
+Ik wil graag een kookworkshop boeken voor mijn verjaardag. We zijn met 10 personen en willen het 3-gangen seizoensmenu doen in Amsterdam. Hebben jullie op 18 mei nog beschikbaarheid? We hebben geen bijzondere allergieën.
+
+Groet,
+Anke Vermeer</div>
+          <button class="mail-run-btn" onclick="event.stopPropagation(); runEmail(0)">AI verwerkt deze mail &rarr;</button>
         </div>
         <div class="mail-time">09:42</div>
       </div>
-      <div class="inbox-mail" onclick="runEmail(1)" data-i="1">
+      <div class="inbox-mail" onclick="expandEmail(1)" data-i="1">
         <div class="mail-dot new"></div>
         <div class="mail-content">
           <div class="mail-from">Petra Houben &lt;p.houben@accenture.com&gt;</div>
           <div class="mail-subject">Teambuilding aanvraag &mdash; 55 personen</div>
           <div class="mail-preview">Namens Accenture zoeken wij een teambuilding activiteit voor onze afdeling...</div>
+          <div class="mail-expanded">Beste,
+
+Namens Accenture zoeken wij een teambuilding activiteit voor onze afdeling van 55 personen. We denken aan juni of juli, locatie Amsterdam of Utrecht. Kunnen jullie een offerte sturen? Budget is beschikbaar.
+
+Met vriendelijke groet,
+Petra Houben
+HR Manager, Accenture</div>
+          <button class="mail-run-btn" onclick="event.stopPropagation(); runEmail(1)">AI verwerkt deze mail &rarr;</button>
         </div>
         <div class="mail-time">10:15</div>
       </div>
-      <div class="inbox-mail" onclick="runEmail(2)" data-i="2">
+      <div class="inbox-mail" onclick="expandEmail(2)" data-i="2">
         <div class="mail-dot"></div>
         <div class="mail-content">
           <div class="mail-from">noreply@horeca-deals.nl</div>
           <div class="mail-subject">Uw horecakorting verloopt vandaag!</div>
           <div class="mail-preview">Beste ondernemer, profiteer nu van onze exclusieve horecakorting. Bespaar 40%...</div>
+          <div class="mail-expanded">Beste ondernemer,
+
+Profiteer nu van onze exclusieve horecakorting. Bespaar 40% op uw volgende bestelling! Tijdelijk aanbod, geldig tot vandaag. Klik hier om uw korting te claimen.
+
+Met vriendelijke groet,
+Het Horeca Deals Team</div>
+          <button class="mail-run-btn" onclick="event.stopPropagation(); runEmail(2)">AI verwerkt deze mail &rarr;</button>
         </div>
         <div class="mail-time">10:58</div>
       </div>
@@ -367,7 +394,18 @@
 </footer>
 
 <script>
-function delay(ms){return new Promise(function(r){setTimeout(r,ms);})}
+function expandEmail(idx){
+  var mails=document.querySelectorAll('.inbox-mail');
+  mails.forEach(function(m){if(m.dataset.i!=idx)m.classList.remove('active');});
+  var target=document.querySelector('[data-i="'+idx+'"]');
+  var wasActive=target.classList.contains('active');
+  if(wasActive)return; // al open, niet opnieuw togglen
+  target.classList.add('active');
+  document.getElementById('pipeline').style.display='none';
+  document.getElementById('mailResult').style.display='none';
+  eRunning=false;
+}
+
 
 async function callAPI(sys,msg){
   var res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({systemPrompt:sys,message:msg})});
