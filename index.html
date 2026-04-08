@@ -133,21 +133,15 @@
   .chat-send:hover { background: var(--yellow-dark); }
   .chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* LEAD CAPTURE POPUP */
-  .popup-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 200; align-items: center; justify-content: center; }
-  .popup-overlay.open { display: flex; }
-  .popup-box { background: var(--white); border-radius: 4px; width: 100%; max-width: 420px; margin: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-  .popup-header { background: var(--brown); padding: 20px 24px; }
-  .popup-header h3 { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--white); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
-  .popup-header p { font-size: 13px; color: rgba(255,255,255,0.55); font-weight: 300; }
-  .popup-body { padding: 24px; display: flex; flex-direction: column; gap: 14px; }
-  .popup-field label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-mid); display: block; margin-bottom: 6px; font-family: var(--font-display); }
-  .popup-field input { width: 100%; background: var(--off-white); border: 1px solid var(--border); border-radius: 3px; padding: 10px 14px; color: var(--text); font-family: var(--font-body); font-size: 14px; outline: none; transition: border-color 0.2s; }
-  .popup-field input:focus { border-color: rgba(0,0,0,0.35); }
-  .popup-optional { font-size: 11px; color: var(--text-light); margin-left: 4px; font-weight: 300; }
-  .popup-submit { width: 100%; padding: 13px; background: var(--yellow); color: var(--brown); border: none; border-radius: 3px; font-family: var(--font-display); font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; letter-spacing: 0.04em; text-transform: uppercase; }
-  .popup-submit:hover { background: var(--yellow-dark); }
-  .popup-privacy { font-size: 11px; color: var(--text-light); text-align: center; }
+  /* INLINE LEAD FORM IN CHAT */
+  .chat-lead-form { background: var(--white); border: 1px solid var(--border); border-radius: 3px; padding: 14px; margin: 4px 0 4px 34px; display: flex; flex-direction: column; gap: 10px; }
+  .chat-lead-form .lf-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-mid); display: block; margin-bottom: 4px; font-family: var(--font-display); }
+  .chat-lead-form input { width: 100%; background: var(--off-white); border: 1px solid var(--border); border-radius: 3px; padding: 8px 12px; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; transition: border-color 0.2s; }
+  .chat-lead-form input:focus { border-color: rgba(0,0,0,0.3); }
+  .chat-lead-form .lf-optional { font-size: 10px; color: var(--text-light); margin-left: 3px; font-weight: 300; }
+  .chat-lead-form .lf-submit { width: 100%; padding: 9px; background: var(--yellow); color: var(--brown); border: none; border-radius: 3px; font-family: var(--font-display); font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; letter-spacing: 0.04em; text-transform: uppercase; }
+  .chat-lead-form .lf-submit:hover { background: var(--yellow-dark); }
+  .chat-lead-form .lf-privacy { font-size: 10px; color: var(--text-light); text-align: center; }
 
   /* FOLLOW-UP */
   .followup-body { padding: 20px 18px; display: flex; flex-direction: column; gap: 14px; }
@@ -179,32 +173,6 @@
 </style>
 </head>
 <body>
-
-<!-- LEAD CAPTURE POPUP -->
-<div class="popup-overlay" id="popupOverlay">
-  <div class="popup-box">
-    <div class="popup-header">
-      <h3>Bijna klaar</h3>
-      <p>Om u beter te helpen, vragen we nog even uw gegevens.</p>
-    </div>
-    <div class="popup-body">
-      <div class="popup-field">
-        <label>Naam</label>
-        <input type="text" id="popupNaam" placeholder="Uw naam" maxlength="80" />
-      </div>
-      <div class="popup-field">
-        <label>Telefoonnummer</label>
-        <input type="tel" id="popupTel" placeholder="06 12345678" maxlength="20" />
-      </div>
-      <div class="popup-field">
-        <label>Bedrijf <span class="popup-optional">(optioneel)</span></label>
-        <input type="text" id="popupBedrijf" placeholder="Uw bedrijfsnaam" maxlength="80" />
-      </div>
-      <button class="popup-submit" onclick="submitPopup()">Verder gaan</button>
-      <div class="popup-privacy">Uw gegevens worden alleen gebruikt om contact op te nemen.</div>
-    </div>
-  </div>
-</div>
 
 <nav>
   <div class="nav-logo">The Farm Kitchen's Kookfabriek<span class="x">&times;</span><span class="briqk">Briqk</span></div>
@@ -549,7 +517,7 @@ async function qualAnswer(text){
   }
   if(qA.length===3){
     addQMsg('Om u beter te helpen, vragen wij nog even uw contactgegevens.','bot');
-    setTimeout(function(){document.getElementById('popupOverlay').classList.add('open');},400);
+    setTimeout(showLeadForm, 300);
     qLoading=false;
     return;
   }
@@ -586,29 +554,39 @@ async function qualAnswer(text){
   }
 }
 
-function submitPopup(){
-  var naam=document.getElementById('popupNaam').value.trim();
-  var tel=document.getElementById('popupTel').value.trim();
-  if(!naam||!tel){
-    if(!naam)document.getElementById('popupNaam').focus();
-    else document.getElementById('popupTel').focus();
-    return;
-  }
-  var bedrijf=document.getElementById('popupBedrijf').value.trim();
+function showLeadForm(){
+  var c=document.getElementById('qualMessages');
+  var d=document.createElement('div');
+  d.className='chat-lead-form';d.id='leadForm';
+  d.innerHTML='<div><label class="lf-label">Naam</label><input type="text" id="lfNaam" placeholder="Uw naam" maxlength="80"/></div>'
+    +'<div><label class="lf-label">Telefoonnummer</label><input type="tel" id="lfTel" placeholder="06 12345678" maxlength="20"/></div>'
+    +'<div><label class="lf-label">Bedrijf <span class="lf-optional">(optioneel)</span></label><input type="text" id="lfBedrijf" placeholder="Uw bedrijfsnaam" maxlength="80"/></div>'
+    +'<button class="lf-submit" onclick="submitLeadForm()">Verder gaan →</button>'
+    +'<div class="lf-privacy">Uw gegevens worden alleen gebruikt om contact op te nemen.</div>';
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+  setTimeout(function(){document.getElementById('lfNaam').focus();},100);
+}
+
+function submitLeadForm(){
+  var naam=document.getElementById('lfNaam').value.trim();
+  var tel=document.getElementById('lfTel').value.trim();
+  if(!naam){document.getElementById('lfNaam').focus();return;}
+  if(!tel){document.getElementById('lfTel').focus();return;}
+  var bedrijf=document.getElementById('lfBedrijf').value.trim();
+  // Verwijder formulier
+  var form=document.getElementById('leadForm');if(form)form.remove();
+  // Voeg gebruikersbericht toe als bevestiging
+  addQMsg(naam+(bedrijf?' — '+bedrijf:''),'user');
   qA.push(naam);qA.push(tel);qA.push(bedrijf||'');
-  document.getElementById('popupOverlay').classList.remove('open');
   updateProgress();
-  // Eerste vraag na popup
   setTimeout(function(){
     addQMsg('Bedankt, '+naam+'! Nog twee korte vragen. '+QUAL[3].q,'bot');
     showQBtns(QUAL[3].btns);
-    qLoading=false;
-  },200);
+  },400);
 }
 
 document.getElementById('qualInput').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();qualAnswer();}});
 document.getElementById('qualSend').addEventListener('click',function(){qualAnswer();});
-document.getElementById('popupOverlay').addEventListener('click',function(e){if(e.target===this){}});
 
 // ===== FOLLOW-UP =====
 var SYS_FU='Je schrijft een post-workshop follow-up e-mail namens The Farm Kitchen\'s Kookfabriek. Warm, persoonlijk, max 100 woorden. Bedank de contactpersoon bij naam, vraag om Google-review (g.page/thefarmkitchen/review), nodig subtiel uit voor een volgende workshop of andere locatie. Eindig met: Met vriendelijke groet,\nHet team van The Farm Kitchen\'s Kookfabriek\nAlleen de e-mailtekst, geen onderwerpregel, geen markdown.';
