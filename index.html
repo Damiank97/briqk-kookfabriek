@@ -552,22 +552,20 @@ async function qualAnswer(text){
     setTimeout(function(){
       var c=document.getElementById('qualMessages');
       var naam2=qA[3]||'de aanvrager';
-      var isWarm2=qA[1].indexOf('100')!==-1||qA[1].indexOf('40')!==-1||qA[7].indexOf('beschikbaar')!==-1;
+      var isWarm2=(qA[1]||'').indexOf('40')!==-1||(qA[1]||'').indexOf('100')!==-1||(qA[7]||'').indexOf('beschikbaar')!==-1;
+      var bdr='border-bottom:1px solid rgba(0,0,0,0.1);';
+      var rows='';
+      if(isWarm2){rows+='<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;'+bdr+'"><span style="color:#A8B000;font-weight:700;">&#x2713;</span> <span style="color:#1A1A1A;">WhatsApp notificatie verstuurd naar <strong>de ontvanger</strong></span></div>';}
+      rows+='<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;'+bdr+'"><span style="color:#A8B000;font-weight:700;">&#x2713;</span> <span style="color:#1A1A1A;">Bevestiging e-mail verstuurd naar <strong>'+naam2+'</strong></span></div>';
+      if(isWarm2){rows+='<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;"><span style="color:#A8B000;font-weight:700;">&#x2713;</span> <span style="color:#1A1A1A;">Lead gemarkeerd als <strong>Warm</strong> — opvolging ingepland</span></div>';}
+      else{rows+='<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;"><span style="color:#8A8580;">→</span> <span style="color:#5A5550;">Lead gemarkeerd als <strong>Koud</strong> — nurture-mail ingepland</span></div>';}
       var card=document.createElement('div');
-      card.style.cssText='margin:10px 0 4px 34px;background:var(--white);border:1px solid var(--border);border-radius:3px;overflow:hidden;font-size:12px;';
-      card.innerHTML='<div style="background:var(--brown);padding:8px 12px;font-family:var(--font-display);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--yellow);">Acties op de achtergrond</div>'
-        +'<div style="display:flex;flex-direction:column;gap:0;">'
-        +(isWarm2?'<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);color:var(--text);">'
-        +'<span style="color:var(--yellow-dark);font-weight:700;">✓</span><span>WhatsApp notificatie verstuurd naar <strong>de ontvanger</strong></span></div>':'')
-        +'<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);color:var(--text);">'
-        +'<span style="color:var(--yellow-dark);font-weight:700;">✓</span><span>Bevestiging e-mail verstuurd naar <strong>'+naam2+'</strong></span></div>'
-        +(isWarm2?'<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;color:var(--text);">'
-        +'<span style="color:var(--yellow-dark);font-weight:700;">✓</span><span>Lead gemarkeerd als <strong>Warm</strong> — opvolging ingepland</span></div>'
-        :'<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;color:var(--text);">'
-        +'<span style="color:var(--text-light);">→</span><span style="color:var(--text-mid);">Lead gemarkeerd als <strong>Koud</strong> — nurture-mail ingepland</span></div>')
-        +'</div>';
-      c.appendChild(card);c.scrollTop=c.scrollHeight;
-    },900);
+      card.style.cssText='margin:10px 0 4px 34px;background:#fff;border:1px solid rgba(0,0,0,0.1);border-radius:3px;overflow:hidden;font-size:12px;';
+      card.innerHTML='<div style="background:#3D2B1F;padding:8px 12px;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#C8D400;">Acties op de achtergrond</div>'+rows;
+      c.appendChild(card);
+      c.scrollTop=9999;
+      setTimeout(function(){c.scrollTop=9999;},80);
+    },700);
     document.getElementById('qualInput').disabled=true;document.getElementById('qualSend').disabled=true;
     document.getElementById('qualInput').placeholder='Gesprek afgerond';
     qLoading=false;
