@@ -307,6 +307,7 @@ Het Horeca Deals Team</div>
       <button class="chat-send" id="qualSend">&#x27A4;</button>
     </div>
   </div>
+  <div id="actieKaart" style="display:none;max-width:660px;margin-top:12px;background:#fff;border:1px solid rgba(0,0,0,0.1);border-radius:3px;overflow:hidden;font-size:13px;"></div>
 </section>
 
 <!-- SECTIE 3: FOLLOW-UP -->
@@ -550,20 +551,32 @@ async function qualAnswer(text){
     }
     // Achtergrond acties kaart
     setTimeout(function(){
-      var c=document.getElementById('qualMessages');
-      var naam2=qA[3]||'de aanvrager';
       var w=(qA[1]||'').indexOf('40')!==-1||(qA[1]||'').indexOf('100')!==-1||(qA[7]||'').indexOf('beschikbaar')!==-1;
-      var bdr='border-bottom:1px solid rgba(0,0,0,0.1)';
-      var hdr='<div style="background:#3D2B1F;padding:8px 12px;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#C8D400;">Acties op de achtergrond</div>';
-      var r1=w?'<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;'+bdr+'"><span style="color:#A8B000;font-weight:700">✓</span>&nbsp;WhatsApp notificatie verstuurd naar <strong>de ontvanger</strong></div>':'';
-      var r2='<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;'+bdr+'"><span style="color:#A8B000;font-weight:700">✓</span>&nbsp;Bevestiging e-mail verstuurd naar <strong>'+naam2+'</strong></div>';
-      var r3=w?'<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;"><span style="color:#A8B000;font-weight:700">✓</span>&nbsp;Lead gemarkeerd als <strong>Warm</strong> — opvolging ingepland</div>':'<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;"><span style="color:#8A8580">→</span>&nbsp;<span style="color:#5A5550">Lead gemarkeerd als <strong>Koud</strong> — nurture-mail ingepland</span></div>';
-      var card=document.createElement('div');
-      card.style.cssText='margin:10px 0 4px 34px;background:#fff;border:1px solid rgba(0,0,0,0.1);border-radius:3px;overflow:hidden;font-size:12px;';
-      card.innerHTML=hdr+r1+r2+r3;
-      c.appendChild(card);
-      c.style.scrollBehavior='auto';
-      c.scrollTop=c.scrollHeight+999;
+      var naam2=qA[3]||'de aanvrager';
+      var kaart=document.getElementById('actieKaart');
+      if(!kaart)return;
+      var hdr=document.createElement('div');
+      hdr.style.cssText='background:#3D2B1F;padding:10px 14px;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#C8D400;';
+      hdr.textContent='Acties op de achtergrond';
+      kaart.appendChild(hdr);
+      function row(icon,tekst,sub){
+        var d=document.createElement('div');
+        d.style.cssText='padding:9px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(0,0,0,0.08);font-size:13px;color:#1A1A1A;';
+        var s=document.createElement('span');
+        s.style.cssText='font-weight:700;color:#A8B000;flex-shrink:0;';
+        s.textContent=icon;
+        var t=document.createElement('span');
+        t.innerHTML=tekst;
+        d.appendChild(s);d.appendChild(t);
+        if(sub){d.style.borderBottom='none';}
+        kaart.appendChild(d);
+      }
+      if(w) row('✓','WhatsApp notificatie verstuurd naar <strong>de ontvanger</strong>',false);
+      row('✓','Bevestiging e-mail verstuurd naar <strong>'+naam2+'</strong>',false);
+      if(w) row('✓','Lead gemarkeerd als <strong>Warm</strong> — opvolging ingepland',true);
+      else row('→','Lead gemarkeerd als <strong>Koud</strong> — nurture-mail ingepland',true);
+      kaart.style.display='block';
+      kaart.scrollIntoView({behavior:'smooth',block:'nearest'});
     },700);
     document.getElementById('qualInput').disabled=true;document.getElementById('qualSend').disabled=true;
     document.getElementById('qualInput').placeholder='Gesprek afgerond';
