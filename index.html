@@ -102,7 +102,7 @@
   .reset-btn:hover { color: var(--text); border-color: rgba(0,0,0,0.25); }
 
   /* CHAT */
-  .chat-messages { min-height: 220px; max-height: 480px; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; background: var(--off-white); }
+  .chat-messages { min-height: 220px; max-height: 600px; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; background: var(--off-white); }
   .chat-messages::-webkit-scrollbar { width: 3px; }
   .chat-messages::-webkit-scrollbar-thumb { background: var(--grey-mid); border-radius: 2px; }
   .progress-bar { height: 3px; background: var(--grey); }
@@ -572,12 +572,12 @@ function showLeadForm(){
     +'<button class="lf-submit" onclick="submitLeadForm()">Verder gaan →</button>'
     +'<div class="lf-privacy">Uw gegevens worden alleen gebruikt om contact op te nemen.</div>';
   c.appendChild(d);
-  // Scroll het widget zodat het formulier zichtbaar is
-  setTimeout(function(){
-    d.scrollIntoView({behavior:'smooth',block:'nearest'});
-    c.scrollTop=c.scrollHeight;
-    document.getElementById('lfNaam').focus();
-  },100);
+  // Scroll na render zodat volledig formulier zichtbaar is
+  function scrollToForm(){c.scrollTop=c.scrollHeight;}
+  scrollToForm();
+  setTimeout(scrollToForm,50);
+  setTimeout(scrollToForm,150);
+  setTimeout(function(){document.getElementById('lfNaam').focus();scrollToForm();},200);
 }
 
 function submitLeadForm(){
